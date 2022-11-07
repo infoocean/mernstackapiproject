@@ -4,6 +4,9 @@ const router = express.Router();
 //require cusromer model
 const customermodel = require('../app/models/customermodel');
 
+//require controllers
+const {userregistration, userlogin} = require('../app/controllers/userscontrollers/usercontroller');
+
 // insert customer  data using promises 
 /*
 router.post('/customerregistration', (req, res) => {
@@ -61,16 +64,11 @@ router.post('/customerregistration', async(req, res) => {
     }
 })
 
-
 //user registration router
-router.post('/userregistration', (req,res)=>{
-    res.send("userregistration")
-})
+router.post('/userregistration', userregistration);
 
 //user login router
-router.post('/userlogin', (req,res)=>{
-    res.send("userlogin")
-})
+router.post('/userlogin', userlogin);
 
 module.exports =  router;
 

@@ -11,7 +11,8 @@ const userSchema = new mongoose.Schema({
     },
     email : {
         type : String,
-        required : true
+        required : true,
+        unique : true
     },
     number:{
         type : String,
@@ -19,11 +20,13 @@ const userSchema = new mongoose.Schema({
     },
     password : {
         type : String,
-        required : true
+        required : true,
+        unique : true
     },
     confirmpassword : {
         type : String,
-        required : true
+        required : true,
+        unique : true
     }
 });
 const usermodel  = mongoose.model('users' , userSchema);
