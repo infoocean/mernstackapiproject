@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-
+const bycrpt = require('bcryptjs');
 //require cusromer model
 const customermodel = require('../app/models/customermodel');
 
@@ -40,12 +40,16 @@ router.post('/customerregistration', (req, res) => {
 // insert data using Async Await method (try catch)
 router.post('/customerregistration', async(req, res) => {
     //console.log(req.body);
+    //hash password
+    const secure_password = await bycrpt.hash(req.body.password, 12);
+    //console.log(secure_password);
+    //return false;
     const userdata = new customermodel({
         firstname : req.body.firstname,
         lastname  : req.body.lastname,
         email     : req.body.email,
-        number    :  req.body.number,
-        password  : req.body.password,
+        number    : req.body.number,
+        password  : secure_password,
         message   : req.body.message
     });
     //console.log(userdata);
