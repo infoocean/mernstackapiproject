@@ -18,7 +18,7 @@ router.post('/customerregistration', (req, res) => {
     if(!email || !number || !password){
          return res.status(422).send({message:"email, number and password feild are required"});
     }else{
-        customermodel.find({email:email}).then((result)=>{
+        customermodel.findOne({email:email}).then((result)=>{
             //console.log(result);
             if(result.length > 0){
                 return res.status(200).json({message:"email allready exists"});

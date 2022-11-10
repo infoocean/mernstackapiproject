@@ -1,5 +1,6 @@
 // require models
 const usermodel =  require('../../models/usersmodel');
+const  bcrypt = require('bcryptjs');
 
 //user registration controller
 const userregistration = async (req, res)=>{
@@ -44,17 +45,23 @@ const userlogin = async (req, res)=>{
         if(!email || !password){
             return res.status(400).json({message:"all feild required"});
         }
-        const isuser = await usermodel.find( { email : email } );
+        const isuser = await usermodel.findOne( { email : email } );
         //console.log(isuser);
-        //console.log(isuser.length);
-        if(isuser.length >= 1){
-            const sendsomedata = {
-                firstname : isuser.firstname,
-                lastname  : isuser.lastname,
-                email     : isuser.email,
-                number    : isuser.number
+        //console.log(isMatch);
+        if(isuser !== null){
+            //verify password
+            const isMatch = await bcrypt.compare(password, isuser.password);
+            if(isMatch){
+                const sendsomedata = {
+                    firstname : isuser.firstname,
+                    lastname  : isuser.lastname,
+                    email     : isuser.email,
+                    number    : isuser.number
+                }
+                res.status(200).send({message:"login successfully", data : sendsomedata});
+            }else{
+                res.status(400).send({message:"invalid crendential"}); 
             }
-            res.status(200).send({message:"login successfully", data : sendsomedata});
         }else{
             res.status(400).send({message:"invalid crendential"}); 
         }
