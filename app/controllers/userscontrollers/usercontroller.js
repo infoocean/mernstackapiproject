@@ -52,13 +52,22 @@ const userlogin = async (req, res)=>{
             //verify password
             const isMatch = await bcrypt.compare(password, isuser.password);
             if(isMatch){
+                // generate login auth tokes
+                const login__auth_token = await isuser.generateAuthToken();
+                //console.log(login__auth_token);
+                //send token in cookies
+                res.cookie("user_login_token", login__auth_token, {
+                    expires: new Date(Date.now() + 900000),
+                    httpOnly : true
+                  }
+                );
                 const sendsomedata = {
                     firstname : isuser.firstname,
                     lastname  : isuser.lastname,
                     email     : isuser.email,
                     number    : isuser.number
                 }
-                res.status(200).send({message:"login successfully", data : sendsomedata});
+                res.status(200).send({message:"login successfully", data : sendsomedata, login__auth_token : login__auth_token});
             }else{
                 res.status(400).send({message:"invalid crendential"}); 
             }
