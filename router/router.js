@@ -5,7 +5,10 @@ const bycrpt = require("bcryptjs");
 const customermodel = require("../app/models/customermodel");
 
 // require middlewares
-const {verifyAuthToken} = require("../app/middlewares/auth/verifyauth");
+const { verifyAuthToken } = require("../app/middlewares/auth/verifyauth");
+const {
+  verifyLoginAuthToken,
+} = require("../app/middlewares/auth/verifyloginauthtoken");
 
 //require controllers
 const {
@@ -90,7 +93,12 @@ router.post("/userregistration", userregistration);
 router.post("/userlogin", userlogin);
 
 //get user
-router.get("/getuser", verifyAuthToken, getusercontroller);
+router.get(
+  "/getuser",
+  verifyAuthToken,
+  verifyLoginAuthToken,
+  getusercontroller
+);
 
 //generate auth token
 router.get("/generateauthtoken", authtokencontroller);
