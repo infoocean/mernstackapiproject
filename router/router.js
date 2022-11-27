@@ -1,13 +1,24 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const bycrpt = require('bcryptjs');
+const bycrpt = require("bcryptjs");
 //require cusromer model
-const customermodel = require('../app/models/customermodel');
+const customermodel = require("../app/models/customermodel");
+
+// require middlewares
+const {verifyAuthToken} = require("../app/middlewares/auth/verifyauth");
 
 //require controllers
-const {userregistration, userlogin} = require('../app/controllers/userscontrollers/usercontroller');
+const {
+  userregistration,
+  userlogin,
+  getusercontroller,
+} = require("../app/controllers/userscontrollers/usercontroller");
+//auth controller
+const {
+  authtokencontroller,
+} = require("../app/controllers/auth/getauthtokencont");
 
-// insert customer  data using promises 
+// insert customer  data using promises
 /*
 router.post('/customerregistration', (req, res) => {
     //console.log(req.body);
@@ -38,41 +49,50 @@ router.post('/customerregistration', (req, res) => {
 */
 
 // insert data using Async Await method (try catch)
-router.post('/customerregistration', async(req, res) => {
-    //console.log(req.body);
-    //hash password
-    const secure_password = await bycrpt.hash(req.body.password, 12);
-    //console.log(secure_password);
-    //return false;
-    const userdata = new customermodel({
-        firstname : req.body.firstname,
-        lastname  : req.body.lastname,
-        email     : req.body.email,
-        number    : req.body.number,
-        password  : secure_password,
-        message   : req.body.message
+router.post("/customerregistration", async (req, res) => {
+  //console.log(req.body);
+  //hash password
+  const secure_password = await bycrpt.hash(req.body.password, 12);
+  //console.log(secure_password);
+  //return false;
+  const userdata = new customermodel({
+    firstname: req.body.firstname,
+    lastname: req.body.lastname,
+    email: req.body.email,
+    number: req.body.number,
+    password: secure_password,
+    message: req.body.message,
+  });
+  //console.log(userdata);
+  try {
+    const check_email_allready_exists = await customermodel.findOne({
+      email: req.body.email,
     });
-    //console.log(userdata);
-    try {
-        const check_email_allready_exists =  await customermodel.findOne({email:req.body.email});
-        //console.log(check_email_allready_exists);
-        if(check_email_allready_exists !== null){
-            return res.status(200).send({error:"email allready exists"});
-        }
-        const savedata = await userdata.save();
-        if(savedata){
-            res.status(201).send({message:"data submitted successfully", data:{savedata}});
-        }
-    } catch (error) {
-        res.status(500).send({error:error.message});
+    //console.log(check_email_allready_exists);
+    if (check_email_allready_exists !== null) {
+      return res.status(200).send({ error: "email allready exists" });
     }
-})
+    const savedata = await userdata.save();
+    if (savedata) {
+      res
+        .status(201)
+        .send({ message: "data submitted successfully", data: { savedata } });
+    }
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+});
 
 //user registration router
-router.post('/userregistration', userregistration);
+router.post("/userregistration", userregistration);
 
 //user login router
-router.post('/userlogin', userlogin);
+router.post("/userlogin", userlogin);
 
-module.exports =  router;
+//get user
+router.get("/getuser", verifyAuthToken, getusercontroller);
 
+//generate auth token
+router.get("/generateauthtoken", authtokencontroller);
+
+module.exports = router;
